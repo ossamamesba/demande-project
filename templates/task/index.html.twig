@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des tâches{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>📋 Ma Liste de Tâches</h1>
+        <a href="{{ path('app_task_new') }}" class="btn btn-primary">+ Nouvelle tâche</a>
+    </div>
+
+    <table class="table table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Id</th>
+                <th>Titre</th>
+                <th>Description</th>
+                <th>Statut</th>
+                <th>Créée le</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for task in tasks %}
+            <tr>
+                <td>{{ task.id }}</td>
+                <td>{{ task.title }}</td>
+                <td>{{ task.description }}</td>
+                <td>
+                    {% if task.isDone %}
+                        <span class="badge bg-success">Terminée</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">En cours</span>
+                    {% endif %}
+                </td>
+                <td>{{ task.createdAt ? task.createdAt|date('Y-m-d H:i') : '' }}</td>
+                <td class="text-end">
+                    <a href="{{ path('app_task_show', {'id': task.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
+                    <a href="{{ path('app_task_edit', {'id': task.id}) }}" class="btn btn-sm btn-outline-primary">Modifier</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6" class="text-center text-muted">Aucune tâche pour l'instant.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
