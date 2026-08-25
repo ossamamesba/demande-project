@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique{% endblock %}
+
+{% block body %}
+<div style="max-width: 1000px; margin: 40px auto;">
+    <h2 style="color: var(--omrane-green);">Historique des projets</h2>
+
+    {% for message in app.flashes('success') %}
+        <div style="background:#d4edda; color:#155724; padding:12px; border-radius:6px; margin-bottom:10px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>N° projet</th>
+                <th>Créé par</th>
+                <th>Date création</th>
+                <th>Date en cours</th>
+                <th>Date fin</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for projet in projets %}
+                <tr>
+                    <td>{{ projet.numeroProjet }}</td>
+                    <td>{{ projet.creePar }}</td>
+                    <td>{{ projet.dateCreation ? projet.dateCreation|date('d/m/Y') : '' }}</td>
+                    <td>{{ projet.dateEnCours ? projet.dateEnCours|date('d/m/Y') : '' }}</td>
+                    <td>{{ projet.dateFin ? projet.dateFin|date('d/m/Y') : '-' }}</td>
+                    <td>
+                        {% if not projet.dateFin %}
+                            <a href="{{ path('app_historique_valider', {id: projet.id}) }}" class="btn-primary" style="text-decoration:none; display:inline-block;">Valider</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6" style="text-align:center;">Aucun projet pour le moment.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

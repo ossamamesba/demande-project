@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des utilisateurs{% endblock %}
+
+{% block body %}
+<div style="max-width: 1000px; margin: 40px auto;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+        <h2 style="color: var(--omrane-green); margin:0;">Gestion des utilisateurs</h2>
+        <a href="{{ path('app_users_new') }}" class="btn-primary" style="text-decoration:none;">+ Nouvel utilisateur</a>
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div style="background:#d4edda; color:#155724; padding:12px; border-radius:6px; margin-bottom:10px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Rôle</th>
+                <th>Statut</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.roles|join(', ') }}</td>
+                    <td>
+                        {% if user.actif %}
+                            <span style="color: var(--omrane-green); font-weight:bold;">Actif</span>
+                        {% else %}
+                            <span style="color: var(--omrane-red); font-weight:bold;">Désactivé</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ path('app_users_toggle', {id: user.id}) }}" style="text-decoration:none; font-weight:bold; color:{{ user.actif ? 'var(--omrane-red)' : 'var(--omrane-green)' }};">
+                            {{ user.actif ? 'Désactiver' : 'Activer' }}
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="4" style="text-align:center;">Aucun utilisateur.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

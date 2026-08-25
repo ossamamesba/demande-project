@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvel utilisateur{% endblock %}
+
+{% block body %}
+<div style="max-width: 600px; margin: 50px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+    <h2 style="margin-top:0; color: var(--omrane-green);">Nouvel utilisateur</h2>
+
+    {{ form_start(form) }}
+        <div style="margin-bottom: 18px;">
+            {{ form_label(form.email) }}
+            {{ form_widget(form.email, {'attr': {'style': 'width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;'}}) }}
+            {{ form_errors(form.email) }}
+        </div>
+
+        <div style="margin-bottom: 18px;">
+            {{ form_label(form.plainPassword) }}
+            {{ form_widget(form.plainPassword, {'attr': {'style': 'width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;'}}) }}
+            {{ form_errors(form.plainPassword) }}
+        </div>
+
+        <div style="margin-bottom: 18px;">
+            {{ form_label(form.roles) }}
+            {{ form_widget(form.roles) }}
+            {{ form_errors(form.roles) }}
+        </div>
+
+        <div style="margin-bottom: 18px;">
+            {{ form_widget(form.actif) }}
+            {{ form_label(form.actif) }}
+        </div>
+
+        <button type="submit" class="btn-primary">Créer l'utilisateur</button>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

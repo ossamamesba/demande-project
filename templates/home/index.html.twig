@@ -1,10 +1,103 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello {{ controller_name }}!{% endblock %}
+{% block title %}Accueil{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .hero {
+            background: linear-gradient(135deg, var(--omrane-green) 0%, #0a4d2a 100%);
+            padding: 70px 20px 100px;
+            text-align: center;
+            color: white;
+        }
+        .hero h2 {
+            font-size: 34px;
+            margin: 0 0 10px;
+        }
+        .hero p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin: 0;
+        }
+        .cards-wrap {
+            max-width: 900px;
+            margin: -60px auto 60px;
+            padding: 0 20px;
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            padding: 40px 35px;
+            width: 260px;
+            text-align: center;
+            text-decoration: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-top: 5px solid var(--omrane-red);
+        }
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.18);
+        }
+        .card .icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #fdeceb;
+        }
+        .card .icon svg {
+            width: 28px;
+            height: 28px;
+            stroke: var(--omrane-red);
+        }
+        .card h3 {
+            margin: 0 0 8px;
+            color: #222;
+            font-size: 19px;
+        }
+        .card p {
+            margin: 0;
+            font-size: 13px;
+            color: #777;
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-<div style="text-align: center; padding: 50px;">
-    <h1>Bienvenue sur ma première page Symfony 🎉</h1>
-    <p>Ce template a été généré par le contrôleur : <strong>{{ controller_name }}</strong></p>
+<div class="hero">
+    <h2>Suivi Demande des Projets</h2>
+    <p>Groupe Al Omrane — Gérez vos demandes de projets et suivez leur historique en un seul endroit.</p>
+</div>
+
+<div class="cards-wrap">
+    <a href="{{ path('app_demande') }}" class="card">
+        <div class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14M5 12h14"/>
+            </svg>
+        </div>
+        <h3>Demande</h3>
+        <p>Créer, activer ou désactiver une demande de projet</p>
+    </a>
+
+    <a href="{{ path('app_historique') }}" class="card">
+        <div class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18h18"/>
+                <path d="M7 15l4-4 3 3 5-6"/>
+            </svg>
+        </div>
+        <h3>Historique</h3>
+        <p>Consulter et valider le suivi des projets</p>
+    </a>
 </div>
 {% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+<div style="max-width: 420px; margin: 80px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+    <h2 style="text-align:center; color: var(--omrane-green); margin-top:0;">Connexion</h2>
+
+    {% if error %}
+        <div style="background:#f8d7da; color:#721c24; padding:12px; border-radius:6px; margin-bottom:20px;">
+            {{ error.messageKey|trans(error.messageData, 'security') }}
+        </div>
+    {% endif %}
+
+    <form method="post">
+        <div style="margin-bottom: 18px;">
+            <label for="username" style="display:block; margin-bottom:6px; font-weight:bold;">Email</label>
+            <input type="email" value="{{ last_username }}" name="email" id="username" autocomplete="email" required autofocus style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;">
+        </div>
+
+        <div style="margin-bottom: 18px;">
+            <label for="password" style="display:block; margin-bottom:6px; font-weight:bold;">Mot de passe</label>
+            <input type="password" name="password" id="password" autocomplete="current-password" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;">
+        </div>
+
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+        <div style="margin-bottom: 18px;">
+            <label>
+                <input type="checkbox" name="_remember_me">
+                Se souvenir de moi
+            </label>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width:100%;">Se connecter</button>
+    </form>
+</div>
+{% endblock %}

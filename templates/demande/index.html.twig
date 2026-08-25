@@ -1,0 +1,94 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Demande de projet{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .form-group {
+            margin-bottom: 22px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="url"],
+        .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+        .form-group input[type="file"] {
+            padding: 10px 0;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container" style="max-width: 800px; margin: 50px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+    <h1 style="margin-top: 0; color: var(--omrane-green);">Nouvelle demande</h1>
+
+    {% for message in app.flashes('success') %}
+        <div style="background:#d4edda; color:#155724; padding:14px; border-radius:6px; margin-bottom:20px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('warning') %}
+        <div style="background:#fff3cd; color:#856404; padding:14px; border-radius:6px; margin-bottom:20px;">
+            ⚠ {{ message }}
+        </div>
+    {% endfor %}
+
+    {% if anomalies is not empty %}
+        <div style="background:#f8d7da; color:#721c24; padding:14px; border-radius:6px; margin-bottom:20px;">
+            <strong>Anomalies détectées :</strong>
+            <ul>
+                {% for anomalie in anomalies %}
+                    <li>{{ anomalie }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {{ form_start(form) }}
+        <div class="form-group">
+            {{ form_label(form.typeDemande) }}
+            {{ form_widget(form.typeDemande) }}
+            {{ form_errors(form.typeDemande) }}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.lienProjet) }}
+            {{ form_widget(form.lienProjet) }}
+            {{ form_errors(form.lienProjet) }}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.dataFile) }}
+            {{ form_widget(form.dataFile) }}
+            {{ form_errors(form.dataFile) }}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.sao) }}
+            {{ form_widget(form.sao) }}
+            {{ form_errors(form.sao) }}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.codeSap) }}
+            {{ form_widget(form.codeSap) }}
+            {{ form_errors(form.codeSap) }}
+        </div>
+
+        <button type="submit" class="btn-primary" style="margin-top: 10px;">Envoyer la demande</button>
+    {{ form_end(form) }}
+</div>
+{% endblock %}
