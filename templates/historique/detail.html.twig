@@ -1,0 +1,182 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Projet {{ projet.numeroProjet }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .detail-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 700px;
+            margin: 40px auto;
+            position: relative;
+        }
+        .detail-toolbar {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0 25px;
+        }
+        .detail-row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .detail-row .label {
+            width: 160px;
+            font-weight: bold;
+            color: #555;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: bold;
+            color: white;
+        }
+        .badge-done { background: var(--omrane-green); }
+        .badge-incomplet { background: #d97706; }
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 10px;
+            max-width: 380px;
+            text-align: center;
+        }
+        .modal-box .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .commentaire-box {
+            margin-top: 15px;
+            background: #f9fafb;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            white-space: pre-wrap;
+            color: #333;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="detail-card">
+    <a href="{{ path('app_historique') }}" style="color: var(--omrane-red); text-decoration:none; font-weight:bold;">&larr; Retour à l'historique</a>
+
+    {% if is_granted('ROLE_ADMIN') or (app.user and app.user.userIdentifier == projet.creePar) %}
+        <a href="{{ path('app_historique_modifier', {id: projet.id}) }}" style="position:absolute; top:25px; right:30px; color: var(--omrane-green); font-weight:bold; text-decoration:none;">✎ Modifier</a>
+    {% endif %}
+
+    <h2 style="color: var(--omrane-green); margin-top: 15px;">{{ projet.numeroProjet }}</h2>
+
+    {% if is_granted('ROLE_ADMIN') %}
+        <div class="detail-toolbar">
+            {% if not projet.dateFin %}
+                <a href="{{ path('app_historique_valider', {id: projet.id}) }}" class="btn-primary" style="text-decoration:none;">Valider</a>
+            {% endif %}
+            <button type="button" class="btn-secondary" onclick="document.getElementById('modal-suppr').classList.add('open')">Supprimer</button>
+        </div>
+    {% endif %}
+
+    <div class="detail-row">
+        <div class="label">Nom projet</div>
+        <div>{{ projet.nomProjet ?: '-' }}</div>
+    </div>
+    <div class="detail-row">
+        <div class="label">Lien projet</div>
+        <div>
+            {% if projet.lienProjet %}
+                <a href="{{ projet.lienProjet }}" target="_blank" rel="noopener">{{ projet.lienProjet }}</a>
+            {% else %}
+                -
+            {% endif %}
+        </div>
+    </div>
+    <div class="detail-row">
+        <div class="label">SAO</div>
+        <div>{{ projet.sao ?: '-' }}</div>
+    </div>
+    <div class="detail-row">
+        <div class="label">Code SAP</div>
+        <div>{{ projet.codeSap ?: '-' }}</div>
+    </div>
+    <div class="detail-row">
+        <div class="label">Créé par</div>
+        <div>{{ projet.creePar }}</div>
+    </div>
+    <div class="detail-row">
+        <div class="label">Date création</div>
+        <div>{{ projet.dateCreation ? projet.dateCreation|date('d/m/Y H:i') : '-' }}</div>
+    </div>
+    <div class="detail-row">
+        <div class="label">Date fin</div>
+        <div>{{ projet.dateFin ? projet.dateFin|date('d/m/Y H:i') : '-' }}</div>
+    </div>
+    <div class="detail-row">
+        <div class="label">Statut</div>
+        <div>
+            {% if projet.dateFin %}
+                <span class="badge badge-done">Terminé</span>
+            {% else %}
+                <span class="badge badge-incomplet">Infos incomplètes</span>
+            {% endif %}
+        </div>
+    </div>
+    
+    <h3 style="color:var(--omrane-green); margin-top:30px;">Commentaire</h3>
+
+ {% if is_granted('ROLE_ADMIN') or (app.user and app.user.userIdentifier == projet.creePar) %}
+    <form method="post" action="{{ path('app_historique_commentaire', {id: projet.id}) }}" style="margin-bottom:20px;">
+        <textarea name="commentaire" rows="4" style="width:100%; padding:12px; border:1px solid #ccc; border-radius:6px; font-family:inherit; font-size:15px;" placeholder="Ex: informations manquantes, erreur à corriger...">{{ projet.commentaire }}</textarea>
+        <input type="hidden" name="_token" value="{{ csrf_token('commentaire' ~ projet.id) }}">
+        <button type="submit" class="btn-primary" style="margin-top:10px;">Enregistrer le commentaire</button>
+    </form>
+ {% else %}
+    <div class="commentaire-box" style="background:#f8f9fa; padding:14px; border-radius:6px;">
+        {% if projet.commentaire %}
+            {{ projet.commentaire|nl2br }}
+        {% else %}
+            Aucun commentaire pour le moment.
+        {% endif %}
+    </div>
+  {% endif %}
+    
+</div>
+
+{% if is_granted('ROLE_ADMIN') %}
+<div class="modal-overlay" id="modal-suppr">
+    <div class="modal-box">
+        <p>Supprimer définitivement le projet <strong>{{ projet.numeroProjet }}</strong> ?</p>
+        <div class="modal-actions">
+            <button type="button" class="btn-secondary" onclick="document.getElementById('modal-suppr').classList.remove('open')">Annuler</button>
+            <a href="{{ path('app_historique_supprimer', {id: projet.id}) }}" class="btn-primary" style="text-decoration:none;">Confirmer la suppression</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

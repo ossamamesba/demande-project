@@ -1,46 +1,184 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}Historique{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: bold;
+            color: white;
+        }
+        .badge-done { background: var(--omrane-green); }
+        .badge-incomplet { background: #d97706; }
+        .filtre-info {
+            margin-bottom: 15px;
+            color: #555;
+        }
+        .filtre-info a {
+            color: var(--omrane-red);
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .lien-demande {
+            color: var(--omrane-green);
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .lien-demande:hover { text-decoration: underline; }
 
+        .btn-commentaire {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+            padding: 4px;
+        }
+        .btn-commentaire:hover { opacity: 0.7; }
+        .no-commentaire {
+            color: #ccc;
+            font-size: 18px;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.actif { display: flex; }
+        .modal-box {
+            background: white;
+            border-radius: 10px;
+            padding: 25px 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .modal-box h3 {
+            margin-top: 0;
+            color: var(--omrane-green);
+        }
+        .modal-box p {
+            white-space: pre-wrap;
+            color: #333;
+            line-height: 1.5;
+        }
+        .modal-close {
+            margin-top: 15px;
+            background: var(--omrane-green);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            float: right;
+        }
+    </style>
+{% endblock %}
 {% block body %}
-<div style="max-width: 1000px; margin: 40px auto;">
-    <h2 style="color: var(--omrane-green);">Historique des projets</h2>
-
+<div style="max-width: 1100px; margin: 40px auto;">
+    <h2 style="color: var(--omrane-green); text-align: center;">Historique des projets</h2>
     {% for message in app.flashes('success') %}
         <div style="background:#d4edda; color:#155724; padding:12px; border-radius:6px; margin-bottom:10px;">
             {{ message }}
         </div>
     {% endfor %}
-
+    {% if statutFiltre %}
+        <div class="filtre-info">
+            Filtré par statut :
+            {% if statutFiltre == 'termine' %}Terminé
+            {% else %}Infos incomplètes
+            {% endif %}
+            — <a href="{{ path('app_historique', recherche ? {q: recherche} : {}) }}">Réinitialiser</a>
+        </div>
+    {% endif %}
+    {% if recherche %}
+        <div class="filtre-info">
+            Recherche : « {{ recherche }} »
+            — <a href="{{ path('app_historique', statutFiltre ? {statut: statutFiltre} : {}) }}">Réinitialiser la recherche</a>
+        </div>
+    {% endif %}
     <table>
         <thead>
             <tr>
-                <th>N° projet</th>
+                <th>N° demande</th>
+                <th>Nom projet</th>
+                <th>Lien projet</th>
                 <th>Créé par</th>
-                <th>Date création</th>
-                <th>Date en cours</th>
                 <th>Date fin</th>
-                <th></th>
+                <th>Statut</th>
+                <th>Commentaire</th>
             </tr>
         </thead>
         <tbody>
             {% for projet in projets %}
                 <tr>
-                    <td>{{ projet.numeroProjet }}</td>
+                    <td>
+                        <a href="{{ path('app_historique_detail', {id: projet.id}) }}" class="lien-demande">{{ projet.numeroProjet }}</a>
+                    </td>
+                    <td>{{ projet.nomProjet ?: '-' }}</td>
+                    <td>
+                        {% if projet.lienProjet %}
+                            <a href="{{ projet.lienProjet }}" target="_blank" rel="noopener">Voir le projet</a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
                     <td>{{ projet.creePar }}</td>
-                    <td>{{ projet.dateCreation ? projet.dateCreation|date('d/m/Y') : '' }}</td>
-                    <td>{{ projet.dateEnCours ? projet.dateEnCours|date('d/m/Y') : '' }}</td>
                     <td>{{ projet.dateFin ? projet.dateFin|date('d/m/Y') : '-' }}</td>
                     <td>
-                        {% if not projet.dateFin %}
-                            <a href="{{ path('app_historique_valider', {id: projet.id}) }}" class="btn-primary" style="text-decoration:none; display:inline-block;">Valider</a>
+                        {% if projet.dateFin %}
+                            <span class="badge badge-done">Terminé</span>
+                        {% else %}
+                            <span class="badge badge-incomplet">Infos incomplètes</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align:center;">
+                        {% if projet.commentaire %}
+                            <button type="button" class="btn-commentaire" title="Voir le commentaire"
+                                    data-numero="{{ projet.numeroProjet }}"
+                                    data-commentaire="{{ projet.commentaire }}"
+                                    onclick="ouvrirCommentaire(this)">💬</button>
+                        {% else %}
+                            <span class="no-commentaire">—</span>
                         {% endif %}
                     </td>
                 </tr>
             {% else %}
-                <tr><td colspan="6" style="text-align:center;">Aucun projet pour le moment.</td></tr>
+                <tr><td colspan="7" style="text-align:center;">Aucun projet pour le moment.</td></tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+<div class="modal-overlay" id="modal-commentaire">
+    <div class="modal-box">
+        <h3 id="modal-commentaire-titre">Commentaire</h3>
+        <p id="modal-commentaire-texte"></p>
+        <button type="button" class="modal-close" onclick="fermerCommentaire()">Fermer</button>
+    </div>
+</div>
+
+<script>
+function ouvrirCommentaire(btn) {
+    document.getElementById('modal-commentaire-titre').textContent = 'Commentaire — ' + btn.dataset.numero;
+    document.getElementById('modal-commentaire-texte').textContent = btn.dataset.commentaire;
+    document.getElementById('modal-commentaire').classList.add('actif');
+}
+function fermerCommentaire() {
+    document.getElementById('modal-commentaire').classList.remove('actif');
+}
+document.getElementById('modal-commentaire').addEventListener('click', function (e) {
+    if (e.target === this) {
+        fermerCommentaire();
+    }
+});
+</script>
 {% endblock %}

@@ -23,11 +23,17 @@ class Projet
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $lienProjet = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $nomProjet = null;
+
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $sao = null;
 
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $codeSap = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $commentaire = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $dateCreation = null;
@@ -82,6 +88,18 @@ class Projet
         return $this;
     }
 
+    public function getNomProjet(): ?string
+    {
+        return $this->nomProjet;
+    }
+
+    public function setNomProjet(?string $nomProjet): static
+    {
+        $this->nomProjet = $nomProjet;
+
+        return $this;
+    }
+
     public function getSao(): ?string
     {
         return $this->sao;
@@ -102,6 +120,18 @@ class Projet
     public function setCodeSap(?string $codeSap): static
     {
         $this->codeSap = $codeSap;
+
+        return $this;
+    }
+
+     public function getCommentaire(): ?string
+    {
+        return $this->commentaire;
+    }
+
+    public function setCommentaire(?string $commentaire): static
+    {
+        $this->commentaire = $commentaire;
 
         return $this;
     }

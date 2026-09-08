@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier {{ projet.numeroProjet }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .form-group {
+            margin-bottom: 22px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="url"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div style="max-width: 700px; margin: 40px auto; background: white; padding: 40px; border-radius: 12px;">
+    <a href="{{ path('app_historique_detail', {id: projet.id}) }}" style="color: var(--omrane-red); text-decoration:none; font-weight:bold;">&larr; Annuler</a>
+
+    <h2 style="color: var(--omrane-green); margin-top: 15px;">Modifier {{ projet.numeroProjet }}</h2>
+
+    {{ form_start(form) }}
+        <div class="form-group">
+            {{ form_label(form.nomProjet) }}
+            {{ form_widget(form.nomProjet) }}
+            {{ form_errors(form.nomProjet) }}
+        </div>
+        <div class="form-group">
+            {{ form_label(form.lienProjet) }}
+            {{ form_widget(form.lienProjet) }}
+            {{ form_errors(form.lienProjet) }}
+        </div>
+        <div class="form-group">
+            {{ form_label(form.sao) }}
+            {{ form_widget(form.sao) }}
+            {{ form_errors(form.sao) }}
+        </div>
+        <div class="form-group">
+            {{ form_label(form.codeSap) }}
+            {{ form_widget(form.codeSap) }}
+            {{ form_errors(form.codeSap) }}
+        </div>
+        <div class="form-group">
+            {{ form_label(form.commentaire) }}
+            {{ form_widget(form.commentaire) }}
+            {{ form_errors(form.commentaire) }}
+        </div>
+
+        <button type="submit" class="btn-primary" style="margin-top: 10px;">Enregistrer les modifications</button>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

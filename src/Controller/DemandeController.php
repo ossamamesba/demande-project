@@ -7,11 +7,13 @@ use App\Form\ProjetType;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class DemandeController extends AbstractController
 {
@@ -46,6 +48,8 @@ class DemandeController extends AbstractController
                 $projet->setNumeroProjet('PRJ-' . date('Y') . '-' . str_pad((string) (random_int(1, 999)), 3, '0', STR_PAD_LEFT));
             }
 
+            $projet->setCreePar($this->getUser()?->getUserIdentifier());
+
             if ($dataFile) {
                 $anomalies = $this->verifierFichierData($dataFile->getPathname(), $dataFile->getClientOriginalExtension());
 
@@ -69,6 +73,35 @@ class DemandeController extends AbstractController
             'form' => $form,
             'anomalies' => $anomalies,
         ]);
+    }
+
+    /**
+     * Récupère le nom du projet en lisant le <title> de la page pointée par le lien.
+     * Appelée en AJAX par le formulaire quand l'utilisateur quitte le champ "Lien".
+     */
+    #[Route('/api/nom-projet', name: 'api_nom_projet', methods: ['GET'])]
+    public function nomProjet(Request $request, HttpClientInterface $httpClient): JsonResponse
+    {
+        $lien = $request->query->get('lien');
+
+        if (!$lien || !filter_var($lien, FILTER_VALIDATE_URL)) {
+            return $this->json(['nom' => null, 'erreur' => 'Lien invalide.'], 400);
+        }
+
+        try {
+            $response = $httpClient->request('GET', $lien, ['timeout' => 8]);
+            $html = $response->getContent();
+
+            $nom = null;
+            if (preg_match('/<title[^>]*>(.*?)<\/title>/is', $html, $matches)) {
+                $nom = html_entity_decode(trim($matches[1]), ENT_QUOTES | ENT_HTML5);
+                $nom = trim(explode('|', $nom)[0]);
+            }
+
+            return $this->json(['nom' => $nom]);
+        } catch (\Throwable $e) {
+            return $this->json(['nom' => null, 'erreur' => 'Impossible de récupérer le nom du projet.'], 502);
+        }
     }
 
     /**

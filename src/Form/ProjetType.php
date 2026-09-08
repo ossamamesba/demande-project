@@ -21,9 +21,9 @@ class ProjetType extends AbstractType
                 'mapped' => false,
                 'label' => 'Type de demande',
                 'choices' => [
-                    'Créer une demande' => 'creer',
-                    'Activer une demande' => 'activer',
-                    'Désactiver une demande' => 'desactiver',
+                    'Créer projet' => 'creer',
+                    'Activer projet' => 'activer',
+                    'Désactiver projet' => 'desactiver',
                 ],
                 'placeholder' => 'Choisir une action',
             ])
@@ -31,6 +31,14 @@ class ProjetType extends AbstractType
                 'label' => 'Lien (projects)',
                 'required' => false,
                 'attr' => ['placeholder' => 'https://...'],
+            ])
+            ->add('nomProjet', TextType::class, [
+                'label' => 'Nom du projet',
+                'required' => false,
+                'attr' => [
+                    'readonly' => true,
+                    'placeholder' => 'Se remplit automatiquement à partir du lien',
+                ],
             ])
             ->add('dataFile', FileType::class, [
                 'mapped' => false,

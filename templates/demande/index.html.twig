@@ -1,4 +1,3 @@
-
 {% extends 'base.html.twig' %}
 
 {% block title %}Demande de projet{% endblock %}
@@ -71,6 +70,12 @@
         </div>
 
         <div class="form-group">
+            {{ form_label(form.nomProjet) }}
+            {{ form_widget(form.nomProjet) }}
+            {{ form_errors(form.nomProjet) }}
+        </div>
+
+        <div class="form-group" id="data-file-row">
             {{ form_label(form.dataFile) }}
             {{ form_widget(form.dataFile) }}
             {{ form_errors(form.dataFile) }}
@@ -91,4 +96,58 @@
         <button type="submit" class="btn-primary" style="margin-top: 10px;">Envoyer la demande</button>
     {{ form_end(form) }}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const formEl = document.querySelector('#{{ form.vars.id }}');
+    const typeSelect = document.querySelector('#{{ form.typeDemande.vars.id }}');
+    const fileRow = document.querySelector('#data-file-row');
+    const lienInput = document.querySelector('#{{ form.lienProjet.vars.id }}');
+    const nomInput = document.querySelector('#{{ form.nomProjet.vars.id }}');
+    const submitBtn = formEl ? formEl.querySelector('button[type="submit"]') : null;
+
+    function toggleFileField() {
+        if (!typeSelect || !fileRow) {
+            return;
+        }
+        fileRow.style.display = (typeSelect.value === 'creer') ? 'none' : 'block';
+    }
+
+    if (typeSelect) {
+        toggleFileField();
+        typeSelect.addEventListener('change', toggleFileField);
+    }
+
+    if (lienInput && nomInput) {
+        lienInput.addEventListener('blur', function () {
+            const lien = lienInput.value.trim();
+            if (!lien) {
+                return;
+            }
+            nomInput.value = 'Recherche en cours...';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+            }
+            fetch('{{ path('api_nom_projet') }}?lien=' + encodeURIComponent(lien))
+                .then(function (response) { return response.json(); })
+                .then(function (data) { nomInput.value = data.nom || ''; })
+                .catch(function () { nomInput.value = ''; })
+                .finally(function () {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                    }
+                });
+        });
+    }
+
+    if (formEl && nomInput) {
+        formEl.addEventListener('submit', function (e) {
+            if (nomInput.value === 'Recherche en cours...') {
+                e.preventDefault();
+                alert('Merci de patienter quelques secondes, le nom du projet est en cours de récupération.');
+            }
+        });
+    }
+});
+</script>
 {% endblock %}
